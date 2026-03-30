@@ -1,0 +1,50 @@
+.footer{
+    width: 100%;
+    font-family: "Paperlogy", sans-serif;
+    background:rgba(229, 248, 241, 0.72);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-sizing: border-box;
+    padding: 70px 32px;
+}
+
+.footer-top{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.footer-logo{
+    width: 50px;
+    height: 50px;
+}
+
+.footer-title{
+    font-size: 27px;
+    font-weight: 700;
+    color: #1c1c1c;
+    margin: 0;
+    letter-spacing: -0.5px;
+}
+.footer-introduction{
+    font-size: 24px;
+    font-weight: 400;
+    color: #1c1c1c;
+    margin-bottom: 40px;
+}
+.footer-info{
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.footer-description span:nth-child(odd) {
+  font-weight: 200;
+  margin-right: 6px;
+}
+
+.footer-description span:nth-child(even) {
+  font-weight: 400;
+  margin-right: 28px;
+}
