@@ -8,14 +8,15 @@ import MainPage from './pages/MainPage/MainPage';
 
 function App() {
   return (
-    <div>
+    <div className="App">
       <Header />
     
-      <Routes>
-        {/* 메인페이지 */}
-        <Route path="/" element={<MainPage />} />
-      </Routes>
-
+      <div className="content">
+        <Routes>
+          {/* 메인페이지 */}
+          <Route path="/" element={<MainPage />} />
+        </Routes>
+      </div>
       <Footer />
     </div>  
 
