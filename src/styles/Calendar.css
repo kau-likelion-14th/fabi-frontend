@@ -1,0 +1,120 @@
+.calendar-container .react-calendar {
+    border: none;
+    font-family: 'Paperlogy', sans-serif;
+    width: 440px;
+}
+
+.calendar-container
+.react-calendar__navigation
+.react-calendar__navigation__label {
+  font-size: 28px;
+  font-weight: bold;
+  font-family: "Paperlogy", sans-serif;
+  color: #333333;
+}
+
+.calendar-container .react-calendar__navigation {
+    margin-bottom: 18px;
+}
+
+.calendar-container .react-calendar__navigation button {
+    font-size: 24px;
+    font-weight: 900;
+    color: #333333;
+}
+
+.calendar-container .react-calendar__month-view__weekdays {
+    font-size: 22px;
+    color: #5c5c5c;
+    font-weight: 500;
+    margin-bottom: 6px;
+}
+
+.calendar-container .react-calendar__month-view__weekdays abbr {
+    text-decoration: none; 
+}
+
+.calendar-container .react-calendar__month-view__weekdays__weekday:first-child {
+    color: #FF383C;
+}
+
+.calendar-container .react-calendar__month-view__days__day--weekend:nth-child(7n+1) {
+    color: #FF383C;
+}
+
+.calendar-container .react-calendar__month-view__weekdays__weekday:last-child {
+    color: #0A84FF;
+}
+
+.calendar-container .react-calendar__month-view__days__day--weekend:nth-child(7n) {
+    color: #0A84FF;
+}
+
+.calendar-container .react-calendar__month-view__days {
+    row-gap: 10px;
+    font-size: 16px;
+}
+
+.calendar-container .react-calendar__tile {
+    position: relative;
+    height: 80px;
+    border-radius: 15px;
+}
+
+.calendar-container .react-calendar__tile::after {
+  content: "";
+  display: block;
+  width: 34px;
+  height: 34px;
+  margin: 10px auto 0;
+  background: #f1f1f1;
+  border-radius: 8px;
+}
+
+.calendar-container .react-calendar__month-view__days__day--neighboringMonth abbr {
+  color: #8f8f8f;
+}
+
+.calendar-container .react-calendar__tile--now { 
+  background: transparent;
+}
+
+.calendar-container .react-calendar__tile--now::after {
+  background: #f1f1f1;
+  border: 2px solid #0A84FF;
+}
+
+/* 이 코드가 없어도 날짜 선택 시에 글자 색이 하얗게 바뀐다...?
+    react-calendar 라이브러리에서 선택된 날짜의 글자 색을 자동으로 
+    하얗게 바꿔주는 기능이 있는 것 같습니다. 
+    따라서, 이 CSS 코드는 선택된 날짜의 글자 색을 명시적으로 하얗게 설정하는 역할을 합니다. 
+    만약 이 코드가 없어도 선택 시에 글자 색이 하얗게 바뀐다면, 
+    react-calendar 라이브러리의 기본 스타일이 이미 선택된 날짜의 
+    글자 색을 하얗게 설정하고 있을 가능성이 있습니다. 
+    그러나, 이 코드를 포함시키는 것은 선택된 날짜의 
+    글자 색이 항상 하얗게 유지되도록 보장하는 역할을 할 수 있습니다. (자동생성 응답내용 Tab) */
+.calendar-container .react-calendar__tile--active abbr,
+.calendar-container .react-calendar__tile--active:nth-child(7n + 1) abbr,
+.calendar-container .react-calendar__tile--active:nth-child(7n) abbr {
+  color: #fff;
+}
+
+.calendar-container .react-calendar__tile--active {
+}
+
+/* 힌트로 주신 이 코드만 쓸 경우 다른 날짜 클릭 시 날짜 아래 표시된
+To do 개수가 달력 밖으로 튕기는 이슈 발생....
+.calendar-container .react-calendar__tile에 position: relative; 이 없으면
+tile 하나하나에 기준점을 줘야함(부모에 relative가 없으면 부모를 기준으로 움직이는 
+absolute가 다른 것을 기준으로 잡음
+클릭 시 박스에 숫자가 약간 가리는 이슈는 일단 나중에 -> 박스 안에 들어가도록 수정 */
+.tile-meta {
+  position: absolute;
+  left: 50%;
+  bottom: 15px;
+  transform: translateX(-50%);
+}
+
+.tile-done .tile-meta{
+}
+
