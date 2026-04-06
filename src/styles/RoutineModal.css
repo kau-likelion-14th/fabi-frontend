@@ -1,0 +1,63 @@
+.routine-header {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.routine-close {
+  position: absolute;
+  left: 0;
+  font-size: 22px;
+  cursor: pointer;
+  color: #333;
+}
+
+.routine-title {
+  font-family: "Paperlogy", sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  color: #333;
+}
+
+.date-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.date-input {
+  width: 40%;
+  height: 40px;
+  border: none;
+  outline: none;
+  background: #dadada;
+  border-radius: 8px;
+  padding: 0 12px;
+  font-size: 14px;
+  font-family: "Paperlogy", sans-serif;
+  font-weight: 500;
+  color: #333;
+}
+
+.date-initial {
+  font-size: 14px;
+  font-family: "Paperlogy", sans-serif;
+  font-weight: 500;
+}
+
+.leftbutton2 {
+  flex: 1;
+  height: 42px;
+  border-radius: 12px;
+  font-family: "Paperlogy", sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+
+  background: #ffffff;
+  border: 2px solid #0A84FF;
+  color: #0A84FF;
+}

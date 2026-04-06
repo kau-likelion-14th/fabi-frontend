@@ -1,39 +1,34 @@
 import React, { useEffect, useState } from "react";
 import "../../styles/Todo.css";
-import RoutineModal from "./RoutineModal";
+import "../../styles/RoutineModal.css";
 
-const TodoModal = ({
+const Days = ["월", "화", "수", "목", "금", "토", "일"];
+
+const RoutineModal = ({
     isOpen,
     onClose,
     onSave,
-    onDelete,
-    initialTodo,
+    initialRoutine,
 }) => {
-    const isEditMode = Boolean(initialTodo);
-
-    const [category, setCategory] = useState("공부");
-    const [text, setText] = useState("");
-    const [routine, setRoutine] = useState(null);
-
-    const [isRoutineModalOpen, setIsRoutineModalOpen] = useState(false);
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
+    const [repeatDays, setRepeatDays] = useState(null);
 
     useEffect(() => {
         if (!isOpen) return;
 
-        setCategory(initialTodo?.category || "공부");
-        setText(initialTodo?.text || "");
-        setRoutine(initialTodo?.routine || null);
-    }, [isOpen, initialTodo]);
+        setStartDate(initialRoutine?.startDate || "");
+        setEndDate(initialRoutine?.endDate || "");
+        setRepeatDays(initialRoutine?.repeatDays ?? null);
+    }, [isOpen, initialRoutine]);
 
     if (!isOpen) return null;
 
     const handleSave = () => {
-        if (!text.trim()) return;
-
         onSave({
-            text: text.trim(),
-            category,
-            routine,
+            startDate,
+            endDate,
+            repeatDays,
         });
     };
 
@@ -43,81 +38,65 @@ const TodoModal = ({
                 className="modal-container"
                 onClick={(e) => e.stopPropagation()}
             >
-                <div className="modal-title">
-                    {isEditMode ? "할 일 수정하기" : "할 일 추가하기"}
+                <div className="routine-header">
+                    <div className="routine-close" onClick={onClose}>{"‹"}</div>
+                    <div className="routine-title">루틴 등록하기</div>
                 </div>
 
                 <div className="modal-section">
-                    <div className="modal-label">카테고리</div>
+                    <div className="modal-label">시작 날짜</div>
+                    <div className="date-wrapper">
+                        <input
+                            type="date"
+                            className="date-input"
+                            value={startDate}
+                            onChange={(e) => setStartDate(e.target.value)}
+                        />
+                        <div className="date-initial">{startDate || "없음"}</div>
+                    </div>
+                </div>
+
+                <div className="modal-section">
+                    <div className="modal-label">종료 날짜</div>
+                    <div className="date-wrapper">
+                        <input
+                            type="date"
+                            className="date-input"
+                            value={endDate}
+                            onChange={(e) => setEndDate(e.target.value)}
+                        />
+                        <div className="date-initial">{endDate || "없음"}</div>
+                    </div>
+                </div>
+
+                <div className="modal-section">
+                    <div className="modal-label">반복</div>
                     <div className="modal-categories">
-                        {["공부", "운동", "동아리"].map((cat) => (
-                            <label key={cat}>
+                        {Days.map((day, idx) => (
+                            <label
+                                key={day}
+                                className={`modal-categoryitem ${repeatDays === idx ? "on" : ""}`}
+                            >
+                                <span>{day}</span>
                                 <input
                                     type="radio"
-                                    name="category"
-                                    value={cat}
-                                    checked={category === cat}
-                                    onChange={() => setCategory(cat)}
+                                    name="repeatDays"
+                                    value={idx}
+                                    checked={repeatDays === idx}
+                                    onChange={() => setRepeatDays(idx)}
                                 />
-                                {cat}
                             </label>
                         ))}
                     </div>
                 </div>
 
-                <div className="modal-section">
-                    <div className="modal-label">내용</div>
-                    <div className="input-wrapper">
-                        <input
-                            type="text"
-                            className="text-input"
-                            placeholder="내용을 입력해주세요"
-                            value={text}
-                            onChange={(e) => setText(e.target.value)}
-                        />
-                    </div>
-                </div>
-
-                <div className="modal-section">
-                    <button
-                        type="button"
-                        className="routine-row"
-                        onClick={() => setIsRoutineModalOpen(true)}
-                    >
-                        <div className="routine-label">루틴 등록하기</div>
-                        <div className="routine-button">{"›"}</div>
-                    </button>
-                </div>
-
                 <div className="modal-actions">
-                    <button
-                        className={`leftbutton ${isEditMode ? "" : "disabled"}`}
-                        onClick={onDelete}
-                        disabled={!isEditMode}
-                    >
-                        삭제
-                    </button>
-                    <button
-                        className={`rightbutton ${text.trim() ? "" : "disabled"}`}
-                        onClick={handleSave}
-                        disabled={!text.trim()}
-                    >
-                        저장
-                    </button>
+                    <button className="leftbutton2" onClick={onClose}>취소</button>
+                    <button className="rightbutton" onClick={handleSave}>저장</button>
                 </div>
-
-                <RoutineModal
-                    isOpen={isRoutineModalOpen}
-                    initialRoutine={routine}
-                    onClose={() => setIsRoutineModalOpen(false)}
-                    onSave={(newRoutine) => {
-                        setRoutine(newRoutine);
-                        setIsRoutineModalOpen(false);
-                    }}
-                />
             </div>
         </div>
     );
 };
 
-export default TodoModal;
+export default RoutineModal;

@@ -1,5 +1,7 @@
 import React, {useMemo, useState} from "react";
 import "../../styles/Todo.css";
+import "../../styles/TodoModal.css";
+import "../../styles/RoutineModal.css";
 import TodoModal from "./TodoModal";
 
 const uid = () => Date.now() + Math.random();
