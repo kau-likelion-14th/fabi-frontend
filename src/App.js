@@ -4,6 +4,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';  
 import MainPage from './pages/MainPage/MainPage'; 
 import LoginPage from './pages/LoginPage/Loginpage';
+import MyPage from './pages/MyPage/MyPage';
 import {  Routes, Route, useLocation } from "react-router-dom";
 
 function App() {
@@ -17,6 +18,8 @@ function App() {
         <Routes>
           {/* 메인페이지 */}
           <Route path="/" element={<MainPage />} />
+          {/* 마이페이지 */}
+          <Route path="/mypage" element={<MyPage />} />
           {/* 로그인페이지 */}
           <Route path="/login" element={<LoginPage />} />
         </Routes>

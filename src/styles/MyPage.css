@@ -1,0 +1,172 @@
+.mypage {
+  width: 100%;
+  min-height: 70vh;
+  padding-top: 140px;
+}
+
+.profile-section,
+.status-section {
+  width: 1000px;
+  margin: 0 auto;
+}
+
+.profile-top {
+  width: 1000px;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.profile-image-box {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  margin-right: 32px;
+  background-color: #ffffff;
+}
+
+.profile-img {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.edit-profile-btn {
+  position: absolute;
+  right: -3px;
+  bottom: 5px;
+  width: 28px;
+  height: 28px;
+  border: 1px solid #8b8b8b;
+  border-radius: 50%;
+  background-color: white;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.hidden-file-input {
+  display: none;
+}
+
+.nickname {
+  font-family: "Paperlogy", sans-serif;
+  font-size: 25px;
+  font-weight: 500;
+  color: #222;
+}
+
+.save-btn {
+  position: absolute;
+  top: 55px;
+  right: 0px;
+  width: 150px;
+  height: 40px;
+  border: none;
+  border-radius: 12px;
+  background-color: #0A84FF;
+  color: white;
+  font-family: "Paperlogy", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.profile-inform {
+  width: 400px;
+  margin-top: 55px;
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-inform div {
+  margin-bottom: 10px;
+  font-family: "Paperlogy", sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: #222;
+}
+
+.profile-text input {
+  width: 400px;
+  height: 45px;
+  padding: 0 16px;
+  margin-bottom: 18px;
+  border: 1px solid #a8a8a8;
+  border-radius: 7px;
+  outline: none;
+  font-family: "Paperlogy", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  box-sizing: border-box;
+}
+
+.profile-song {
+  width: 400px;
+  height: 45px;
+  padding: 0 15px;
+  border: 1px solid #a8a8a8;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-sizing: border-box;
+}
+
+.profile-song input {
+  flex: 1;
+  height: 100%;
+  border: none;
+  outline: none;
+  font-family: "Paperlogy", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.search-btn {
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  font-size: 17px;
+}
+
+.status-section {
+  margin-top: 58px;
+  display: flex;
+  gap: 20px;
+}
+
+.stat-card {
+  width: 320px;
+  height: 112px;
+  padding: 20px 45px;
+  border-radius: 16px;
+  background-color: #f1f1f1;
+  box-sizing: border-box;
+}
+
+.stat-icon {
+  font-size: 22px;
+  margin-right: 10px;
+}
+
+.stat-title {
+  font-family: "Paperlogy", sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: #222;
+}
+
+.stat-number {
+  font-family: "Paperlogy", sans-serif;
+  font-size: 22px;
+  font-weight: 500;
+  color: #111;
+  margin-right: 4px;
+}
+
+.stat-card div:last-child {
+  margin-top: 10px;
+  margin-left: 40px;
+}
