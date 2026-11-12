@@ -13,7 +13,8 @@ const toDateKey = (date) => {
 export default function CustomCalendar({
     initialDate = new Date(),
     onDateChange,
-    todosByDate = {},
+    onMonthChange,
+    remainingByDate = {},
 }) {
     const [selectedDate, setSelectedDate] = useState(initialDate);
 
@@ -23,19 +24,11 @@ export default function CustomCalendar({
         onDateChange?.(next);
     };
 
-    const getDayMeta = (date) => {
-        const key = toDateKey(date);
-        const list = todosByDate[key] ?? [];
-        if (list.length === 0) return { hasTodos: false, remaining: 0, allDone: false };
-
-        const remaining = list.filter((t) => !t.completed).length;
-        return { hasTodos: true, remaining, allDone: remaining === 0 };
-    };
-
     return (
         <div className="calendar-container">
             <Calendar
                 onChange={handledDateChange}
+                onActiveStartDateChange={({ activeStartDate }) => onMonthChange?.(activeStartDate)}
                 value={selectedDate}
                 calendarType='gregory'
                 view='month'
@@ -45,20 +38,20 @@ export default function CustomCalendar({
                 formatDay={(locale, date) => String(date.getDate())}
                 tileContent={({ date, view }) => {
                     if (view !== 'month') return null;
-                    const { hasTodos, remaining, allDone } = getDayMeta(date);
-                    if (!hasTodos) return null;
+                    const remaining = remainingByDate[toDateKey(date)];
+                    if (remaining === undefined) return null;
 
                     return (
                         <div className="tile-meta">
-                            {allDone ? "★" : remaining}
+                            {remaining === 0 ? "★" : remaining}
                         </div>
                     );
                 }}
                 tileClassName={({ date, view }) => {
                     if (view !== 'month') return "";
-                    const { hasTodos, allDone } = getDayMeta(date);
-                    if (!hasTodos) return "";
-                    return allDone ? "tile-done" : "tile-has";
+                    const remaining = remainingByDate[toDateKey(date)];
+                    if (remaining === undefined) return "";
+                    return remaining === 0 ? "tile-done" : "tile-has";
                 }}
             />
         </div>

@@ -10,165 +10,129 @@
    Profile
 ========================= */
 
-.profile-section {
+.profile-container {
   width: 1080px;
   margin: 0 auto 46px;
-
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: flex-start;
 }
 
-.profile-left {
+.profile-section {
   display: flex;
-  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
 }
 
-.profile-top {
-  display: flex;
-  align-items: center;
-  gap: 28px;
-  margin-bottom: 34px;
-}
-
-.profile-image-box {
+.profile-image {
+  width: 150px;
+  height: 150px;
   position: relative;
-  width: 120px;
-  height: 120px;
+  flex-shrink: 0;
+  margin-right: 35px;
 }
 
-.profile-img {
-  width: 120px;
-  height: 120px;
-
+.profile-img{
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
   object-fit: cover;
+  display: block;
 }
 
-.profile-edit-btn {
+.profile-img-edit {
   position: absolute;
-  right: -4px;
-  bottom: 8px;
-
+  bottom: 0;
+  right: 0;
   width: 30px;
   height: 30px;
-
   border: none;
   border-radius: 50%;
-
   background: #7777e8;
-  color: #ffffff;
-
+  color: #fff;
   font-size: 15px;
   font-weight: 700;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
   cursor: pointer;
 }
 
-.profile-file-input {
-  display: none;
+.profile-name {
+  font-size: 28px;
+  font-weight: bold;
+  color: #333333;
+  margin-top: 30px;
 }
 
-.profile-nickname {
-  font-size: 26px;
-  font-weight: 800;
-  color: #111111;
-}
-
-.profile-form {
-  width: 520px;
-}
-
-.profile-label {
-  display: block;
-
-  font-size: 15px;
-  font-weight: 600;
-  color: #111111;
-
-  margin-bottom: 10px;
-}
-
-.profile-input {
-  width: 100%;
-  height: 48px;
-
-  border: 1px solid #dddddd;
-  border-radius: 10px;
-
-  padding: 0 14px;
-  box-sizing: border-box;
-
-  font-size: 14px;
-  font-family: "Paperlogy", sans-serif;
-
-  margin-bottom: 18px;
-  outline: none;
-}
-
-.profile-input:focus {
-  border-color: #8585f4;
-}
-
-.song-input-box {
-  width: 100%;
-  height: 48px;
-
-  border: 1px solid #dddddd;
-  border-radius: 10px;
-
-  display: flex;
-  align-items: center;
-
-  padding: 0 14px;
-  box-sizing: border-box;
-}
-
-.song-icon {
-  margin-right: 8px;
-  font-size: 15px;
-}
-
-.song-input {
-  flex: 1;
-
+.profile-edit {
+  padding: 15px 70px;
+  font-size: 18px;
+  background-color: #0A84FF;
   border: none;
-  outline: none;
-
+  border-radius: 15px;
+  cursor: pointer;
   font-family: "Paperlogy", sans-serif;
-  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  margin-left: auto;
+  margin-top: auto;
 }
 
-.search-icon {
-  font-size: 24px;
+.profile-info {
+  margin: 70px 0 0;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.profile-details {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.profile-title {
+  font-size: 20px;
+  font-weight: 500;
+  color: #333333;
+}
+
+.profile-content-box {
+  padding: 20px 20px;
+  border-radius: 10px;
+  border: 1px solid #5c5c5c;
+  width: 450px;
+  max-width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 12px;
+}
+
+.profile-content{
+  font-size: 16px;
   color: #8f8f8f;
+  flex: 1;
+  min-width: 0;
 }
 
-.profile-save-btn {
-  width: 150px;
-  height: 48px;
-
-  margin-top: 36px;
-
-  border: none;
-  border-radius: 8px;
-
-  background: #8585f4;
-  color: #ffffff;
-
-  font-size: 15px;
-  font-weight: 600;
-  font-family: "Paperlogy", sans-serif;
-
+.profile-search-icon {
+  width: 18px;
+  height: 18px;
   cursor: pointer;
 }
 
-.profile-save-btn:hover {
-  background: #7373ea;
+.profile-content-input {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  font-family: 'Paperlogy', sans-serif;
+  color: #8F8F8F;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding-right: 20px;
+  box-sizing: border-box;
 }
 
 /* =========================
@@ -227,13 +191,9 @@
 ========================= */
 
 @media (max-width: 1200px) {
-  .profile-section,
+  .profile-container,
   .status-section {
     width: 80%;
-  }
-
-  .profile-form {
-    width: 480px;
   }
 }
 
@@ -243,15 +203,11 @@
     gap: 30px;
   }
 
-  .profile-save-btn {
-    margin-top: 0;
+  .profile-edit {
+    margin: 0;
   }
 
   .status-section {
     grid-template-columns: 1fr;
-  }
-
-  .profile-form {
-    width: 100%;
   }
 }
