@@ -113,8 +113,10 @@ absolute가 다른 것을 기준으로 잡음
   left: 50%;
   bottom: 15px;
   transform: translateX(-50%);
+  color: #595959;
 }
 
 .tile-done .tile-meta{
+  color: #0A84FF;
 }
 
