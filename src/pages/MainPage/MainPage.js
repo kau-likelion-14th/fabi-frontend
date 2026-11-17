@@ -18,10 +18,6 @@ const MainPage = () => {
   const [todosByDate, setTodosByDate] = useState({});
   const [remainingByDate, setRemainingByDate] = useState({});
   const [refreshKey, setRefreshKey] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [todoError, setTodoError] = useState("");
-  const [calendarError, setCalendarError] = useState("");
-  const refresh = () => setRefreshKey((prev) => prev + 1);
   const dateKey = toDateKey(selectedDate);
   const year = viewDate.getFullYear();
   const month = viewDate.getMonth() + 1;
@@ -30,10 +26,8 @@ const MainPage = () => {
     let active = true;
 
     const fetchCalendar = async () => {
-      setCalendarError("");
       try {
         const data = await get(config.CALENDAR.GET, { year, month });
-        if (data?.isSuccess === false) throw new Error(data.message);
         if (!active) return;
 
         const days = Array.isArray(data?.result?.days) ? data.result.days : [];
@@ -41,7 +35,7 @@ const MainPage = () => {
           days.filter((day) => day.hasTodo).map(({ date, remaining }) => [date, remaining])
         ));
       } catch (error) {
-        if (active) setCalendarError("캘린더를 불러오지 못했습니다.");
+        if (active) console.error("캘린더 조회 실패", error);
       }
     };
 
@@ -53,11 +47,8 @@ const MainPage = () => {
     let active = true;
 
     const fetchTodos = async () => {
-      setLoading(true);
-      setTodoError("");
       try {
         const data = await get(config.TODOS.LIST, { date: dateKey });
-        if (data?.isSuccess === false) throw new Error(data.message);
         if (!active) return;
 
         const list = Array.isArray(data?.result) ? data.result : [];
@@ -72,9 +63,7 @@ const MainPage = () => {
           [dateKey]: todos,
         }));
       } catch (error) {
-        if (active) setTodoError("할 일을 불러오지 못했습니다.");
-      } finally {
-        if (active) setLoading(false);
+        if (active) console.error("Todo 조회 실패", error);
       }
     };
 
@@ -84,22 +73,16 @@ const MainPage = () => {
 
   return (
     <div className="mainpage-container">
-      <div className="mainpage-calendar">
-      {calendarError && <p role="alert">{calendarError} <button onClick={refresh}>다시 시도</button></p>}
-      <CustomCalendar
+      <CustomCalendar 
         initialDate={selectedDate}
         onDateChange={setSelectedDate}
         onMonthChange={setViewDate}
         remainingByDate={remainingByDate}
       />
-      </div>
-      <Todo key={dateKey}
+      <Todo 
         dateKey={dateKey}
         todosByDate={todosByDate}
-        onTodosChanged={refresh}
-        loading={loading}
-        loadError={todoError}
-        onRetry={refresh}
+        onCompletionChanged={() => setRefreshKey((prev) => prev + 1)}
       />
     </div>
   );
