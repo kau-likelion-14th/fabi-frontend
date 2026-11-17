@@ -158,3 +158,14 @@
   gap: 56px;
   align-items: start;
 }
+
+@media (max-width: 1000px) {
+  .friend-detail-page__songs-inline { transform: none; }
+  .friend-detail-page__grid { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  .friend-detail-page__calendar .react-calendar { width: 100%; max-width: 440px; }
+}
+@media (max-width: 600px) {
+  .friend-detail-page__top { flex-wrap: wrap; }
+  .friend-detail-page__songs-inline { max-width: 100%; }
+  .friend-detail-page__profile { flex-shrink: 1; }
+}

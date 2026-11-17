@@ -7,6 +7,8 @@ const config = {
 
     TODOS: {
         LIST: "/api/todos",
+        DETAIL: (todoId) => `/api/todos/${todoId}`,
+        DELETE: (todoId, date) => `/api/todos/${todoId}/dates/${date}`,
         TOGGLE_COMPLETE: (todoId, date) => `/api/todos/${todoId}/dates/${date}/complete`,
     },
 
@@ -26,9 +28,9 @@ const config = {
 
     AUTH:{
         KAKAO: "/api/auth/kakao",
-        REISSUE: "api/auth/reissue",
-        LOGOUT: "api/auth/logout",
-        WITHDRAW: "api/auth/withdraw"
+        REISSUE: "/api/auth/reissue",
+        LOGOUT: "/api/auth/logout",
+        WITHDRAW: "/api/auth/withdraw"
     },
 };
 

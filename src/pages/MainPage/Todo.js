@@ -1,157 +1,137 @@
-import React, {useEffect, useMemo, useState} from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "../../styles/Todo.css";
 import "../../styles/TodoModal.css";
 import "../../styles/RoutineModal.css";
 import TodoModal from "./TodoModal";
-import { get, patch } from "../../Api";
+import { get, post, put, del, patch } from "../../Api";
 import config from "../../Config";
 
-const uid = () => Date.now() + Math.random();
-
-const categoryStyles = { // 카테고리별 디자인 설정 (배경색과 글자색)
-    공부: { backgroundColor: '#E5F8F1', color: '#333' },
-    운동: { backgroundColor: '#FFC8BE', color: '#333' },
-    동아리: { backgroundColor: '#B6DAFF', color: '#333' },
+const checkResponse = (data) => {
+    if (data?.isSuccess === false) throw new Error(data.message || "요청에 실패했습니다.");
+    return data?.result;
 };
+const errorMessage = (error) => error.response?.data?.message || error.message || "다시 시도해 주세요.";
 
-const Todo = ({ dateKey, todosByDate, setTodosByDate, onCompletionChanged }) => {
-    const todos = todosByDate[dateKey] ?? []; // 해당 날짜의 할 일 목록을 가져오되, 데이터가 없으면 빈 배열([])로 처리
-
-    const setTodos = (updater) => {
-        setTodosByDate((prev) => {
-            const current = prev[dateKey] ?? []; // 현재 날짜의 할 일, ?? []를 붙여줌으로써, 데이터가 없는 날짜라도 **"일단 빈 상자([])를 하나 준비해줘"**라고 명령하는 것입니다. 덕분에 에러 없이 새 할 일을 그 상자에 담을 수 있
-            const nextTodos = typeof updater === "function" ? updater(current) : updater; // 업데이트 방식이 함수면 실행하고, 아니면 값 그대로 사용
-            return { ...prev, [dateKey]: nextTodos }; // 기존 데이터(...prev)는 유지하고, 현재 날짜의 데이터만 새것으로 교체
-        });
-    };
-
-    const [isModalOpen, setIsModalOpen] = useState(false); // 모달이 열렸는지 여부
-    const [editingTodo, setEditingTodo] = useState(null); // 지금 수정 중인 할 일 정보 (새로 만들 때는 null)
+const Todo = ({ dateKey, todosByDate, onTodosChanged, loading, loadError, onRetry }) => {
+    const todos = todosByDate[dateKey] ?? [];
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingTodo, setEditingTodo] = useState(null);
     const [serverCategories, setServerCategories] = useState([]);
+    const [categoriesLoading, setCategoriesLoading] = useState(false);
+    const [categoryError, setCategoryError] = useState("");
+    const [busy, setBusy] = useState(false);
+    const [error, setError] = useState("");
+    const lock = useRef(false);
 
     useEffect(() => {
         if (!isModalOpen) return;
-
         let active = true;
-
-        const fetchCategories = async () => {
-            try {
-                const data = await get(config.CATEGORIES.GET);
-                if (active) setServerCategories(Array.isArray(data?.result) ? data.result : []);
-            } catch (error) {
-                if (active) console.error("카테고리 조회 실패", error);
-            }
-        };
-
-        fetchCategories();
+        setCategoriesLoading(true);
+        setCategoryError("");
+        get(config.CATEGORIES.GET).then((data) => {
+            const result = checkResponse(data);
+            if (!Array.isArray(result)) throw new Error("카테고리 응답을 확인할 수 없습니다.");
+            if (active) setServerCategories(result);
+        }).catch((err) => {
+            if (active) setCategoryError(`카테고리를 불러오지 못했습니다. 창을 다시 열어 주세요. ${errorMessage(err)}`);
+        }).finally(() => {
+            if (active) setCategoriesLoading(false);
+        });
         return () => { active = false; };
     }, [isModalOpen]);
 
     const categories = Object.fromEntries(serverCategories.map(({ categoryName, color }) => [
-        categoryName,
-        color ? { backgroundColor: color, color: "#333" } : categoryStyles[categoryName],
+        categoryName, { backgroundColor: color || "#E5F8F1", color: "#333" },
     ]));
-
-    const openModal = () => { // [+] 버튼 눌렀을 때 (새로 만들기)
+    const closeModal = () => {
+        if (!lock.current) setIsModalOpen(false);
+    };
+    const openModal = () => {
+        setError("");
         setEditingTodo(null);
         setIsModalOpen(true);
     };
-
-    const openEditModal = (todo) => { // 이미 있는 할 일을 클릭했을 때 (수정하기)
-        setEditingTodo(todo);
+    const runRequest = async (action) => {
+        if (lock.current) return;
+        lock.current = true;
+        setBusy(true);
+        setError("");
+        try { await action(); }
+        catch (err) { setError(errorMessage(err)); }
+        finally { lock.current = false; setBusy(false); }
+    };
+    const openEditModal = (todo) => runRequest(async () => {
+        const detail = checkResponse(await get(config.TODOS.DETAIL(todo.id)));
+        if (!detail) throw new Error("할 일 상세 정보를 불러오지 못했습니다.");
+        setEditingTodo({
+            id: detail.todoId,
+            text: detail.description,
+            category: detail.categoryName,
+            routine: detail.routineEnabled ? {
+                startDate: detail.startDate,
+                endDate: detail.endDate,
+                week: detail.week,
+            } : null,
+        });
         setIsModalOpen(true);
-    };
-
-    const TodoCompleted = async (todo) => {
-        if (todo.isLocal) {
-            setTodos((prev) => prev.map((t) =>
-                t.id === todo.id ? { ...t, completed: !t.completed } : t
-            ));
-            return;
-        }
-
-        try {
-            const data = await patch(config.TODOS.TOGGLE_COMPLETE(todo.id, dateKey), {
-                completed: !todo.completed,
-            });
-            if (data?.isSuccess === false) throw new Error(data.message);
-            onCompletionChanged();
-        } catch (error) {
-            console.error("Todo 완료 상태 변경 실패", error);
-        }
-    };
-
-    const handledSaveTodo = ({text, category}) => { // 저장 버튼 클릭 시 (수정 또는 추가)
-        if (editingTodo) { // 1. 수정 모드일 때
-            setTodos((prev) =>
-                prev.map((t) => 
-                    t.id === editingTodo.id 
-                        ? { ...t, text, category } 
-                        : t
-                )
-            );
-        } else { // 2. 새로 추가 모드일 때
-            setTodos((prev) => [
-                  ...prev, // ← "기존에 있던 애들 다 데리고 와!" (복사)
-                { id: uid(), text, category, completed: false, isLocal: true },
-            ]);
-        }
+    });
+    const toggleCompleted = (todo) => runRequest(async () => {
+        checkResponse(await patch(config.TODOS.TOGGLE_COMPLETE(todo.id, dateKey), {
+            completed: !todo.completed,
+        }));
+        onTodosChanged();
+    });
+    const saveTodo = ({ text, category, routine }) => runRequest(async () => {
+        const payload = {
+            description: text,
+            categoryName: category,
+            routineEnabled: Boolean(routine),
+            startDate: routine?.startDate || null,
+            endDate: routine?.endDate || null,
+            week: routine?.week || null,
+        };
+        checkResponse(editingTodo
+            ? await put(config.TODOS.DETAIL(editingTodo.id), payload)
+            : await post(config.TODOS.LIST, payload, { params: { date: dateKey } }));
         setIsModalOpen(false);
-    };
-
-    const handledDeleteTodo = () => { // 삭제 버튼 클릭 시
+        onTodosChanged();
+    });
+    const deleteTodo = () => runRequest(async () => {
         if (!editingTodo) return;
-        setTodos((prev) => prev.filter((t) => t.id !== editingTodo.id));
+        checkResponse(await del(config.TODOS.DELETE(editingTodo.id, dateKey)));
         setIsModalOpen(false);
-    };
-
-    const counts = useMemo(() => { //통계 계산
-        const total = todos.length; // 전체 개수
-        const done = todos.filter((t) => t.completed).length; // 완료된 개수
-        return { total, done };
-    }, [todos]);
+        onTodosChanged();
+    });
 
     return (
-        <div className="todo-container">
+        <div className="todo-container" aria-busy={busy || loading}>
             <div className="todo-header">
                 <div className="todo-title">To do List</div>
-                <button className="todo-add" onClick={openModal}>+</button> 
+                <button className="todo-add" aria-label="할 일 추가" onClick={openModal} disabled={busy || loading}>+</button>
             </div>
+            <p className="todo-date">{dateKey}</p>
+            {loading && <p role="status">할 일을 불러오는 중...</p>}
+            {loadError && <p role="alert">{loadError} <button onClick={onRetry}>다시 시도</button></p>}
+            {!isModalOpen && error && <p role="alert">{error}</p>}
+            {!loading && !loadError && todos.length === 0 && <p className="todo-empty">등록된 할 일이 없습니다.</p>}
             <div className="todo-list">
-                {todos.map((t) => (
-                    <div 
-                        key={t.id} 
-                        className={`todo-item ${t.completed ? 'done' : ''}`}
-                        onClick={() => openEditModal(t)}
-                    >
-                        <button 
-                            className={`checkbox ${t.completed ? 'checked' : ''}`} 
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                TodoCompleted(t);
-                            }}
-                        >
+                {todos.map((todo) => (
+                    <div key={todo.id} className={`todo-item ${todo.completed ? 'done' : ''}`}>
+                        <button className={`checkbox ${todo.completed ? 'checked' : ''}`}
+                            aria-label={`${todo.text} 완료`} aria-pressed={todo.completed}
+                            disabled={busy || loading} onClick={() => toggleCompleted(todo)} />
+                        <button className="todo-edit" disabled={busy || loading} onClick={() => openEditModal(todo)}>
+                            <span className="todo-text">{todo.text}</span>
+                            <span className="todo-category" style={categories[todo.category]}>{todo.category}</span>
                         </button>
-                        <div className="todo-text">{t.text}</div>
-                        <div 
-                            className="todo-category"
-                            style={categories[t.category] ?? categoryStyles[t.category]}
-                        >
-                            {t.category}
-                        </div>
                     </div>
                 ))}
             </div>
-            <TodoModal 
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onSave={handledSaveTodo}
-                onDelete={handledDeleteTodo}
-                initialTodo={editingTodo}
-                categories={categories}
-            />
+            <TodoModal isOpen={isModalOpen} onClose={closeModal} onSave={saveTodo}
+                onDelete={deleteTodo} initialTodo={editingTodo} categories={categories}
+                busy={busy} error={error || categoryError} categoriesLoading={categoriesLoading}
+                dateKey={dateKey} />
         </div>
     );
 };
-
 export default Todo;

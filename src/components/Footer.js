@@ -1,7 +1,5 @@
 import "../styles/Footer.css";
 import logo from "../assets/img/logo.png";
-import LogoutIcon from "../assets/icon/logout.png";
-import { NavLink } from "react-router-dom";
 
 function Footer() {
     return (

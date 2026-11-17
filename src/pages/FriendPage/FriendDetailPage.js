@@ -79,7 +79,6 @@ function FriendDetailPage() {
   const [savedSongs] = useState(dummySavedSongs);
 
   const [selectedDate, setSelectedDate] = useState(new Date("2026-05-04"));
-  const [viewDate, setViewDate] = useState(new Date("2026-05-04"));
 
   const [todosByDate] = useState(dummyTodosByDate);
   const [remainingByDate] = useState(dummyRemainingByDate);
@@ -188,11 +187,6 @@ function FriendDetailPage() {
               // 달력에서 날짜가 바뀌면 selectedDate를 변경
               // selectedDate가 바뀌면 todos도 다시 계산됨
               onDateChange={(date) => date && setSelectedDate(date)}
-              // 달력에서 월이 바뀔 때 현재 보고 있는 달 정보를 저장
-              onMonthChange={(date) => {
-                if (!date) return;
-                setViewDate(date);
-              }}
               todosByDate={todosByDate}
               remainingByDate={remainingByDate}
             />

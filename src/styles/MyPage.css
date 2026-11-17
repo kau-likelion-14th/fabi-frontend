@@ -211,3 +211,8 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 600px) {
+  .mypage { padding-top: 140px; }
+  .profile-info { width: 100%; }
+}

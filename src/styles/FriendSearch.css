@@ -96,3 +96,6 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.friend-search__input { box-sizing: border-box; }
+.friend-search__left { flex: 1; }
