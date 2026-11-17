@@ -60,7 +60,7 @@ const MainPage = () => {
         }));
         setTodosByDate((prev) => ({
           ...prev,
-          [dateKey]: [...todos, ...(prev[dateKey] ?? []).filter((todo) => todo.isLocal)],
+          [dateKey]: todos,
         }));
       } catch (error) {
         if (active) console.error("Todo 조회 실패", error);
@@ -71,27 +71,17 @@ const MainPage = () => {
     return () => { active = false; };
   }, [dateKey, refreshKey]);
 
-  const calendarRemainingByDate = { ...remainingByDate };
-  for (const [date, todos] of Object.entries(todosByDate)) {
-    const localTodos = todos.filter((todo) => todo.isLocal);
-    if (localTodos.length === 0) continue;
-
-    const localRemaining = localTodos.filter((todo) => !todo.completed).length;
-    calendarRemainingByDate[date] = (remainingByDate[date] ?? 0) + localRemaining;
-  }
-
   return (
     <div className="mainpage-container">
       <CustomCalendar 
         initialDate={selectedDate}
         onDateChange={setSelectedDate}
         onMonthChange={setViewDate}
-        remainingByDate={calendarRemainingByDate}
+        remainingByDate={remainingByDate}
       />
       <Todo 
         dateKey={dateKey}
         todosByDate={todosByDate}
-        setTodosByDate={setTodosByDate}
         onCompletionChanged={() => setRefreshKey((prev) => prev + 1)}
       />
     </div>
