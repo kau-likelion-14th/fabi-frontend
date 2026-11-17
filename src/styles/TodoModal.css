@@ -124,18 +124,3 @@
   border: none;
   color: #ffffff;
 }
-.modal-overlay { z-index: 1100; padding: 16px; box-sizing: border-box; }
-.modal-container { position: relative; width: min(400px, 100%); max-height: calc(100dvh - 32px); overflow-y: auto; }
-.modal-fields { border: 0; padding: 0; margin: 0; min-width: 0; }
-.modal-close { position: absolute; top: 8px; right: 12px; border: 0; background: transparent; font-size: 26px; cursor: pointer; }
-.modal-categories { flex-wrap: wrap; }
-.modal-categoryitem { min-width: 28px; }
-.modal-categoryitem span { border-radius: 12px; padding: 4px; overflow-wrap: anywhere; }
-.modal-hint, .routine-summary { font-size: 13px; color: #595959; line-height: 1.5; overflow-wrap: anywhere; }
-.modal-container [role="alert"], .todo-container [role="alert"], .mainpage-calendar [role="alert"] { color: #b42318; font-size: 14px; }
-.modal-container button:disabled { opacity: .45; cursor: default; }
-@media (max-width: 480px) {
-  .modal-container { padding: 28px 20px 20px; }
-  .modal-section { margin-bottom: 24px; }
-  .modal-categories { gap: 8px; }
-}

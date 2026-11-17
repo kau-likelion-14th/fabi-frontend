@@ -109,21 +109,30 @@ const Todo = ({ dateKey, todosByDate, onTodosChanged, loading, loadError, onRetr
                 <div className="todo-title">To do List</div>
                 <button className="todo-add" aria-label="할 일 추가" onClick={openModal} disabled={busy || loading}>+</button>
             </div>
-            <p className="todo-date">{dateKey}</p>
             {loading && <p role="status">할 일을 불러오는 중...</p>}
             {loadError && <p role="alert">{loadError} <button onClick={onRetry}>다시 시도</button></p>}
             {!isModalOpen && error && <p role="alert">{error}</p>}
             {!loading && !loadError && todos.length === 0 && <p className="todo-empty">등록된 할 일이 없습니다.</p>}
             <div className="todo-list">
                 {todos.map((todo) => (
-                    <div key={todo.id} className={`todo-item ${todo.completed ? 'done' : ''}`}>
+                    <div key={todo.id} className={`todo-item ${todo.completed ? 'done' : ''}`}
+                        role="button" tabIndex={busy || loading ? -1 : 0}
+                        aria-label={`${todo.text} ${todo.category}`} aria-disabled={busy || loading}
+                        onClick={() => !busy && !loading && openEditModal(todo)}
+                        onKeyDown={(event) => {
+                            if (event.target === event.currentTarget && (event.key === 'Enter' || event.key === ' ')) {
+                                event.preventDefault();
+                                if (!busy && !loading) openEditModal(todo);
+                            }
+                        }}>
                         <button className={`checkbox ${todo.completed ? 'checked' : ''}`}
                             aria-label={`${todo.text} 완료`} aria-pressed={todo.completed}
-                            disabled={busy || loading} onClick={() => toggleCompleted(todo)} />
-                        <button className="todo-edit" disabled={busy || loading} onClick={() => openEditModal(todo)}>
-                            <span className="todo-text">{todo.text}</span>
-                            <span className="todo-category" style={categories[todo.category]}>{todo.category}</span>
-                        </button>
+                            disabled={busy || loading} onClick={(event) => {
+                                event.stopPropagation();
+                                toggleCompleted(todo);
+                            }} />
+                        <div className="todo-text">{todo.text}</div>
+                        <div className="todo-category" style={categories[todo.category]}>{todo.category}</div>
                     </div>
                 ))}
             </div>

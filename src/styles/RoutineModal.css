@@ -61,6 +61,3 @@
   border: 2px solid #0A84FF;
   color: #0A84FF;
 }
-.date-input { width: 58%; min-width: 0; box-sizing: border-box; }
-.date-initial { white-space: nowrap; }
-.routine-close { border: 0; background: transparent; }

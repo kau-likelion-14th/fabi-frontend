@@ -90,16 +90,3 @@
     cursor: pointer;
 }
 
-
-@media (max-width: 1200px) {
-  .header-title { display: none; }
-  .header-right { margin-right: 0; }
-  .header-nav { gap: 24px; }
-}
-@media (max-width: 600px) {
-  .header { top: 8px; left: 12px; right: 12px; height: 112px; padding: 12px 16px 48px; border-radius: 24px; }
-  .header-left { margin-left: 0; }
-  .header-nav { top: 76px; gap: 24px; white-space: nowrap; }
-  .nav-item { font-size: 15px; }
-  .user-name { font-size: 14px; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-}

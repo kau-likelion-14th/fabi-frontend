@@ -15,8 +15,3 @@
     gap: 80px;
     align-items: flex-start;
 }
-.friend-page { min-height: calc(100vh - 120px); }
-.friend-page__grid > * { min-width: 0; }
-@media (max-width: 900px) {
-  .friend-page__grid { grid-template-columns: minmax(0, 1fr); gap: 40px; }
-}

@@ -120,6 +120,3 @@ absolute가 다른 것을 기준으로 잡음
   color: #0A84FF;
 }
 
-
-.calendar-container .react-calendar__tile::after { box-sizing: border-box; }
-.calendar-container .tile-meta { z-index: 1; bottom: 15px; line-height: 34px; height: 34px; }

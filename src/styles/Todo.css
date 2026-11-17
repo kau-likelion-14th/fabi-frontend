@@ -100,8 +100,3 @@
   white-space: nowrap;
   box-sizing: border-box;
 }
-.todo-date, .todo-empty { color: #777; font-size: 14px; }
-.todo-text { min-width: 0; overflow-wrap: anywhere; text-align: left; }
-.checkbox { flex-shrink: 0; }
-.todo-edit { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; border: 0; background: transparent; padding: 4px 0; cursor: pointer; }
-.todo-category { flex-shrink: 0; background: #E5F8F1; }
