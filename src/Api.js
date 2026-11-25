@@ -13,7 +13,7 @@ let refreshPromise = null;
 
 export const renewAccessToken = () => {
     if (!refreshPromise) {
-        refreshPromise = axios.post(config.AUTH.REISSUE, {}, { withCredentials: true })
+        refreshPromise = axios.post(config.AUTH.REISSUE, {}, {  baseURL : config.API_URL, withCredentials: true })
             .then(({data}) => {
                 const token = data?.result;
 

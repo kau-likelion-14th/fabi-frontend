@@ -24,6 +24,8 @@ const config = {
 
     YOUTUBE: {
         ME: "/api/youtube/me",
+        SEARCH: "/api/youtube/search",
+        SAVE: "/api/youtube/save",
     },
 
     AUTH:{
@@ -32,6 +34,11 @@ const config = {
         LOGOUT: "/api/auth/logout",
         WITHDRAW: "/api/auth/withdraw"
     },
+
+    STATISTICS: {
+        GET: "/api/statistic",
+    },
+
 };
 
 export default config;
