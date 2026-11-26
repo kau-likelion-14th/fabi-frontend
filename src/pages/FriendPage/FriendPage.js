@@ -24,8 +24,31 @@ const testUser = {
 };
 const sampleUsers = [...initialSampleFriends, testUser];
 
+function getSampleStorageKey() {
+  try {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const account = user?.userId ?? user?.id ?? user?.username;
+    return account == null ? "fabi.sampleFollowings" : `fabi.sampleFollowings:${account}`;
+  } catch {
+    return "fabi.sampleFollowings";
+  }
+}
+
+function loadSampleFriends(storageKey) {
+  try {
+    const ids = JSON.parse(localStorage.getItem(storageKey));
+    if (Array.isArray(ids)) {
+      return sampleUsers.filter((friend) => ids.includes(friend.id));
+    }
+  } catch {
+    return initialSampleFriends;
+  }
+  return initialSampleFriends;
+}
+
 function FriendPage() {
-  const [sampleFriends, setSampleFriends] = useState(initialSampleFriends);
+  const [sampleStorageKey] = useState(getSampleStorageKey);
+  const [sampleFriends, setSampleFriends] = useState(() => loadSampleFriends(sampleStorageKey));
   const [followList, setFollowList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
@@ -40,6 +63,14 @@ function FriendPage() {
   const [followError, setFollowError] = useState("");
   const [searchRefreshKey, setSearchRefreshKey] = useState(0);
   const displayedFriends = [...sampleFriends, ...followList];
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(sampleStorageKey, JSON.stringify(sampleFriends.map((friend) => friend.id)));
+    } catch {
+      // 브라우저 저장소를 사용할 수 없어도 현재 화면에서 더미를 조작할 수 있습니다.
+    }
+  }, [sampleFriends, sampleStorageKey]);
 
   useEffect(() => {
     let active = true;
