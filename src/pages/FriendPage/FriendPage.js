@@ -16,30 +16,44 @@ const initialSampleFriends = [
   { id: "sample-5", name: "딜런", tag: "1777", bio: "." },
 ];
 
+const testUser = {
+  id: "sample-test",
+  name: "팔로우 테스트",
+  tag: "0001",
+  bio: "팔로우와 언팔로우를 연습할 수 있는 계정입니다.",
+};
+const sampleUsers = [...initialSampleFriends, testUser];
+
 function FriendPage() {
   const [sampleFriends, setSampleFriends] = useState(initialSampleFriends);
   const [followList, setFollowList] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState("");
+  const [loadError, setLoadError] = useState(false);
+  const [loadAttempt, setLoadAttempt] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedFriend, setSelectedFriend] = useState(null);
   const removingRef = useRef(false);
   const [isRemoving, setIsRemoving] = useState(false);
+  const [removeError, setRemoveError] = useState("");
   const followingRef = useRef(false);
   const [followingId, setFollowingId] = useState(null);
   const [followError, setFollowError] = useState("");
   const [searchRefreshKey, setSearchRefreshKey] = useState(0);
+  const displayedFriends = [...sampleFriends, ...followList];
 
   useEffect(() => {
     let active = true;
     const controller = new AbortController();
     const loadFollowings = async () => {
       setLoading(true);
-      setLoadError("");
+      setLoadError(false);
       try {
         const { data } = await api.get(config.FOLLOW.FOLLOWINGS, {
           signal: controller.signal,
         });
+        if (data?.isSuccess === false || !Array.isArray(data?.result)) {
+          throw new Error("팔로잉 목록 응답을 확인해 주세요.");
+        }
         const friends = data.result.map(toFriendModel);
         if (active) setFollowList(friends);
       } catch {
@@ -53,18 +67,26 @@ function FriendPage() {
       active = false;
       controller.abort();
     };
-  }, []);
+  }, [loadAttempt]);
 
   const handleFollow = async (user) => {
     if (
       !user ||
-      loading ||
-      loadError ||
       isModalOpen ||
       followingRef.current ||
-      removingRef.current ||
-      followList.some((friend) => friend.id === user.id)
+      removingRef.current
     ) {
+      return;
+    }
+
+    if (user.userId == null) {
+      setSampleFriends((friends) =>
+        friends.some((friend) => friend.id === user.id) ? friends : [...friends, user]
+      );
+      return;
+    }
+
+    if (loading || loadError || followList.some((friend) => friend.id === user.id)) {
       return;
     }
 
@@ -106,34 +128,36 @@ function FriendPage() {
 
   const handleClickRemove = (friend) => {
     if (removingRef.current || followingRef.current) return;
+    setRemoveError("");
     setSelectedFriend(friend);
     setIsModalOpen(true);
   };
 
   const handleConfirmRemove = async () => {
     if (!selectedFriend || removingRef.current || followingRef.current) return;
+
     if (selectedFriend.userId == null) {
       setSampleFriends((friends) => friends.filter((friend) => friend.id !== selectedFriend.id));
-      setIsModalOpen(false);
-      setSelectedFriend(null);
+      handleCloseModal();
       return;
     }
 
     removingRef.current = true;
     setIsRemoving(true);
+    setRemoveError("");
     try {
       const { data } = await api.delete(config.FOLLOW.DELETE, {
         data: { toUserId: selectedFriend.userId },
       });
       if (data?.isSuccess === false) {
-        return;
+        throw new Error("언팔로우 응답을 확인해 주세요.");
       }
       setFollowList((prev) => prev.filter((friend) => friend.id !== selectedFriend.id));
       setIsModalOpen(false);
       setSelectedFriend(null);
       setSearchRefreshKey((value) => value + 1);
     } catch {
-      return;
+      setRemoveError("언팔로우에 실패했습니다. 다시 시도해 주세요.");
     } finally {
       removingRef.current = false;
       setIsRemoving(false);
@@ -151,16 +175,30 @@ function FriendPage() {
       <div className="friend-page__inner">
         <div className="friend-page__grid">
           <FriendList
-            friends={[...sampleFriends, ...followList]}
+            friends={displayedFriends}
             onClickRemove={handleClickRemove}
-            emptyText="팔로우하는 친구가 없습니다."
+            status={
+              loading ? (
+                <span role="status">팔로잉 목록을 불러오는 중...</span>
+              ) : loadError ? (
+                <>
+                  <span role="alert">팔로잉 목록을 불러오지 못했습니다.</span>{" "}
+                  <button type="button" onClick={() => setLoadAttempt((value) => value + 1)}>
+                    다시 시도
+                  </button>
+                </>
+              ) : null
+            }
           />
           <FriendSearch
             onFollow={handleFollow}
-            followingList={followList}
+            followingList={displayedFriends}
+            sampleUsers={sampleUsers}
+            testUser={testUser}
             followingId={followingId}
             followError={followError}
-            followDisabled={loading || Boolean(loadError) || isModalOpen || isRemoving}
+            followDisabled={isModalOpen || isRemoving}
+            apiFollowDisabled={loading || loadError}
             refreshKey={searchRefreshKey}
           />
         </div>
@@ -170,6 +208,8 @@ function FriendPage() {
         friend={selectedFriend}
         onConfirm={handleConfirmRemove}
         onClose={handleCloseModal}
+        isRemoving={isRemoving}
+        error={removeError}
       />
     </div>
   );

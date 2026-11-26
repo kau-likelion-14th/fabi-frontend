@@ -7,20 +7,23 @@ import "../../styles/FriendSearch.css";
 import searchIcon from "../../assets/icon/search.png";
 
 function requestSearch(nickname, page, signal) {
-  return api.get(nickname ? config.FOLLOW.SEARCH : config.FOLLOW.AVAILABLE, {
-    params: nickname ? { nickname, page, size: 10 } : { page, size: 10 },
+  return api.get(config.FOLLOW.SEARCH, {
+    params: { nickname, page, size: 10 },
     signal,
   });
 }
 
 function FriendSearch({
   title = "팔로우 요청",
-  placeholder = "이름/태그로 검색",
+  placeholder = "닉네임으로 검색",
   onFollow,
   followingList = [],
   followingId = null,
   followError = "",
   followDisabled = false,
+  apiFollowDisabled = false,
+  sampleUsers = [],
+  testUser,
   refreshKey = 0,
 }) {
   const navigate = useNavigate();
@@ -34,14 +37,28 @@ function FriendSearch({
   const [error, setError] = useState("");
 
   const nickname = query.trim();
+  const localResults = nickname
+    ? sampleUsers.filter((user) =>
+        user.name.includes(nickname) ||
+        user.tag.includes(nickname) ||
+        `${user.name}#${user.tag}`.includes(nickname)
+      )
+    : testUser ? [testUser] : [];
+  const displayedResults = [
+    ...(page === 0 ? localResults : []),
+    ...(!nickname || loading || error ? [] : results),
+  ];
 
   useEffect(() => {
+    if (!nickname) return;
+
     let active = true;
     const controller = new AbortController();
 
     setLoading(true);
     setError("");
     setResults([]);
+    setTotalPages(0);
 
     const timer = setTimeout(async () => {
       try {
@@ -94,12 +111,14 @@ function FriendSearch({
     if (nextQuery.trim() !== nickname) {
       setPage(0);
       setResults([]);
+      setTotalPages(0);
+      setLoading(Boolean(nextQuery.trim()));
       setError("");
     }
   };
 
   const goFriendDetail = (friend) => {
-    navigate("/friends/detail", { state: { friend } });
+    navigate(`/friends/${friend.id}`, { state: { friend } });
   };
 
   return (
@@ -121,7 +140,9 @@ function FriendSearch({
 
       {followError && <p role="alert">{followError}</p>}
 
-      {loading ? (
+      {!nickname ? (
+        <div className="friend-search__empty">검색할 닉네임을 입력해 주세요.</div>
+      ) : loading ? (
         <p role="status">검색 중...</p>
       ) : error ? (
         <div>
@@ -133,11 +154,13 @@ function FriendSearch({
             다시 시도
           </button>
         </div>
-      ) : results.length === 0 ? (
+      ) : displayedResults.length === 0 ? (
         <div className="friend-search__empty">검색 결과가 없습니다.</div>
-      ) : (
+      ) : null}
+
+      {displayedResults.length > 0 && (
         <ul className="friend-search__list">
-          {results.map((user) => {
+          {displayedResults.map((user) => {
             const isFollowing = followingList.some(
               (friend) => friend.id === user.id
             );
@@ -164,7 +187,7 @@ function FriendSearch({
                   <div className="friend-info">
                     <div className="friend-info__top">
                       <span className="friend-info__name">{user.name}</span>
-                      <span className="friend-info__tag">#{user.tag}</span>
+                      {user.tag && <span className="friend-info__tag">#{user.tag}</span>}
                     </div>
                     <div className="friend-info__bio">{user.bio || "한 줄 소개"}</div>
                   </div>
@@ -176,7 +199,8 @@ function FriendSearch({
                   disabled={
                     isFollowing ||
                     followingId !== null ||
-                    followDisabled
+                    followDisabled ||
+                    (user.userId != null && apiFollowDisabled)
                   }
                   onClick={() => onFollow?.(user)}
                 >
@@ -188,7 +212,7 @@ function FriendSearch({
         </ul>
       )}
 
-      {!loading && !error && totalPages > 1 && (
+      {nickname && !loading && !error && totalPages > 1 && (
         <div>
           <button
             type="button"

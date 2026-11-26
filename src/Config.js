@@ -2,11 +2,10 @@ const config = {
     API_URL: "",
 
     FOLLOW: {
-        AVAILABLE: "/api/follow",
         FOLLOWINGS: "/api/follow/followings",
-        DELETE: "/api/follow",
         SEARCH: "/api/follow/search",
         CREATE: "/api/follow",
+        DELETE: "/api/follow",
     },
 
     CALENDAR: {

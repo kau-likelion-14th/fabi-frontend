@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import "../../styles/FriendUnfollowModal.css";
 
 // 친구를 팔로우 목록에서 삭제할지 확인하는 모달
-function FriendUnfollowModal({ isOpen, friend, onConfirm, onClose }) {
+function FriendUnfollowModal({ isOpen, friend, onConfirm, onClose, isRemoving, error }) {
   // 모달이 열렸을 때 ESC 키로 닫을 수 있도록 이벤트 설정
   useEffect(() => {
     // 모달이 닫혀 있으면 이벤트를 등록할 필요가 없음
@@ -49,14 +49,17 @@ function FriendUnfollowModal({ isOpen, friend, onConfirm, onClose }) {
           삭제하시겠습니까?
         </p>
 
+        {error && <p role="alert">{error}</p>}
+
         <div className="friend-unfollow-modal__actions">
           <button
             type="button"
             className="friend-unfollow-modal__btn friend-unfollow-modal__btn--yes"
             // 예 버튼을 누르면 부모 컴포넌트에서 넘겨준 삭제 확정 함수 실행
             onClick={onConfirm}
+            disabled={isRemoving}
           >
-            예
+            {isRemoving ? "처리 중..." : "예"}
           </button>
 
           <button
@@ -64,6 +67,7 @@ function FriendUnfollowModal({ isOpen, friend, onConfirm, onClose }) {
             className="friend-unfollow-modal__btn friend-unfollow-modal__btn--no"
             // 아니오 버튼을 누르면 모달만 닫음
             onClick={onClose}
+            disabled={isRemoving}
           >
             아니오
           </button>

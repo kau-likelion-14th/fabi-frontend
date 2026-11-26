@@ -11,6 +11,7 @@ function FriendList(
     friends = [],
     onClickRemove,
     emptyText = "팔로우하는 친구가 없습니다.",
+    status,
   }
 ) {
   //페이지 이동을 위한 useNavigate 훅
@@ -26,9 +27,10 @@ function FriendList(
     <section className="friend-list">
       {/* 부모에게 전달받은 제목을 출력 */}
       <h2 className="friend-list__title">{title}</h2>
+      {status && <div className="friend-list__empty">{status}</div>}
       {/* friends 배열의 길이가 0이면 친구가 없는 상태이므로 안내 문구를 보여줌 */}
       {friends.length === 0 ? (
-        <div className="friend-list__empty">{emptyText}</div>
+        !status && <div className="friend-list__empty">{emptyText}</div>
       ) : (
         // 친구가 있으면 ul 태그 안에 친구 목록을 출력
         <ul className="friend-list__items">
