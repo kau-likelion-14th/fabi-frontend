@@ -174,9 +174,7 @@ const Profile = () => {
 
     try {
       const response = await post(config.YOUTUBE.SAVE, {
-        songId: selectedSong.videoId,
-        title: selectedSong.title,
-        artist: selectedSong.artist,
+        songId: selectedSong.songId,
       });
       if (!response?.isSuccess) {
         throw new Error(response?.message || "노래 저장 실패");
@@ -272,7 +270,7 @@ const Profile = () => {
               ) : (
                 searchResults.map((item) => (
                   <div
-                    key={item.videoId}
+                    key={item.songId}
                     className="song-search-item"
                     onClick={() => { if (!isSaving) handleSelectSong(item); }}
                     >
