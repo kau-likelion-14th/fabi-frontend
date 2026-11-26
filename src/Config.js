@@ -6,6 +6,9 @@ const config = {
         SEARCH: "/api/follow/search",
         CREATE: "/api/follow",
         DELETE: "/api/follow",
+        PROFILE: (id) => `/api/follow/${id}`,
+        CALENDAR: (id) => `/api/follow/${id}/calendar`,
+        TODOS: (id) => `/api/follow/${id}/todos`,
     },
 
     CALENDAR: {
