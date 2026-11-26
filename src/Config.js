@@ -1,6 +1,13 @@
 const config = {
     API_URL: "",
 
+    FOLLOW: {
+        FOLLOWINGS: "/api/follow/followings",
+        SEARCH: "/api/follow/search",
+        CREATE: "/api/follow",
+        DELETE: "/api/follow",
+    },
+
     CALENDAR: {
         GET: "/api/todos/calendar",
     },
