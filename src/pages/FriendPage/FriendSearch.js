@@ -1,52 +1,11 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { get } from "../../Api";
+import config from "../../Config";
+import { toFriendModel } from "./friendModel";
 import "../../styles/FriendSearch.css";
 import searchIcon from "../../assets/icon/search.png";
 
-
-// 임시 사용자 데이터
-const dummyUsers = [
-    {
-        id: "1",
-        userId: 1,
-        name: "나나",
-        tag: "1234",
-        bio: "안녕하세요! 저는 나나입니다.",
-        profileImageUrl: null,
-    },
-    {
-        id: "2",
-        userId: 2,
-        name: "얀",
-        tag: "2342",
-        bio: "^^",
-        profileImageUrl: null,
-    },
-    {
-        id: "3",
-        userId: 3,
-        name: "지말",
-        tag: "1214",
-        bio: "ㅎㅎ",
-        profileImageUrl: null,
-    },
-    {
-        id: "4",
-        userId: 4,
-        name: "코다",
-        tag: "1223",
-        bio: ";ㅁ;",
-        profileImageUrl: null,
-    },
-    {
-        id: "5",
-        userId: 5,
-        name: "딜런",
-        tag: "1777",
-        bio: ".",
-        profileImageUrl: null,
-    },
-];
 
 // 친구를 검색하고 팔로우할 수 있는 컴포넌트
 function FriendSearch({
@@ -54,6 +13,7 @@ function FriendSearch({
   placeholder = "이름/태그로 검색",
   onFollow,
   followingList = [],
+  followDisabled = false,
 }) {
   const navigate = useNavigate();
   // 검색창에 입력한 값을 저장하는 state
@@ -66,29 +26,39 @@ function FriendSearch({
     return new Set(followingList.map((x) => x.id));
   }, [followingList]);
 
-  // 검색어가 바뀔 때마다 검색 결과를 계산함
-  // query 값이 변경되면 useMemo가 다시 실행되고, 화면의 검색 결과도 바뀜
-  const results = useMemo(() => {
-    // 앞뒤 공백을 제거한 검색어
-    const q = query.trim();
-    // 검색어가 비어 있으면 검색 결과를 보여주지 않기 위해 빈 배열 반환
-    if (!q) return [];
+  const [search, setSearch] = useState(null);
+  const nickname = query.trim();
+  const currentSearch = search?.nickname === nickname ? search : null;
+  const results = currentSearch?.users ?? [];
 
-    // dummyUsers 배열에서 검색어와 일치하는 유저만 남김
-    // 이름, 태그, 이름#태그 형식 중 하나라도 포함되면 검색 결과에 포함됨
-    return dummyUsers.filter((user) => {
-      return (
-        user.name.includes(q) ||
-        user.tag.includes(q) ||
-        `${user.name}#${user.tag}`.includes(q)
-      );
-    });
-  }, [query]);
+  useEffect(() => {
+    if (!nickname) return undefined;
+    let active = true;
+
+    async function loadResults() {
+      try {
+        const data = await get(config.FOLLOW.SEARCH, { nickname });
+        if (data?.isSuccess === false || !Array.isArray(data?.result?.content)) {
+          throw new Error();
+        }
+        if (active) setSearch({ nickname, users: data.result.content.map(toFriendModel) });
+      } catch {
+        if (active) setSearch({ nickname, error: true });
+      }
+    }
+
+    setSearch(null);
+    const timer = setTimeout(loadResults, 250);
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
+  }, [nickname]);
 
   // 검색 결과에서 친구 정보를 클릭했을 때 상세 페이지로 이동
   // 선택한 친구 정보를 state로 같이 넘겨 상세 페이지에서 사용할 수 있게 함
   const goFriendDetail = (friend) => {
-    navigate("/friends/detail", { state: { friend } });
+    navigate(`/friends/${friend.id}`, { state: { friend } });
   };
 
   return (
@@ -114,7 +84,11 @@ function FriendSearch({
         />
       </div>
 
-      {query.trim() === "" ? null : results.length === 0 ? (
+      {!nickname ? null : !currentSearch ? (
+        <div className="friend-search__empty" role="status">검색 중입니다.</div>
+      ) : currentSearch.error ? (
+        <div className="friend-search__empty" role="status">검색 결과를 불러오지 못했습니다.</div>
+      ) : results.length === 0 ? (
         <div className="friend-search__empty">검색 결과가 없습니다.</div>
       ) : (
         <ul className="friend-search__list">
@@ -172,7 +146,7 @@ function FriendSearch({
                     // 선택한 user 객체를 넘겨서 부모 쪽에서 팔로우 목록에 추가할 수 있음
                     onFollow?.(user);
                   }}
-                  disabled={isFollowing}
+                  disabled={isFollowing || followDisabled}
                 >
                   {/* 이미 팔로우 중이면 팔로잉, 아니면 팔로우 표시 */}
                   {isFollowing ? "팔로잉" : "팔로우"}

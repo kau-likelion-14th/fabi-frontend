@@ -14,6 +14,15 @@ const config = {
         GET: "/api/categories",
     },
 
+    FOLLOW: {
+        ROOT: "/api/follow",
+        FOLLOWINGS: "/api/follow/followings",
+        SEARCH: "/api/follow/search",
+        PROFILE: (id) => `/api/follow/${id}`,
+        CALENDAR: (id) => `/api/follow/${id}/calendar`,
+        TODOS: (id) => `/api/follow/${id}/todos`,
+    },
+
     PROFILE: {
         GET: "/api/profile",
         IMAGE: "/api/profile",

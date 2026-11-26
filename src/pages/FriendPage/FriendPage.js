@@ -1,83 +1,78 @@
 import React from 'react';
-import { useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import FriendList from './FriendList';
-import FreindSearch from './FriendSearch';
-import FreindUnfollowModal from './FriendUnfollowModal';
+import FriendSearch from './FriendSearch';
+import FriendUnfollowModal from './FriendUnfollowModal';
+import { del, get, post } from '../../Api';
+import config from '../../Config';
+import { toFriendModel } from './friendModel';
 import '../../styles/FriendPage.css';
 import '../../styles/FriendList.css';
 
-const initialFollowList = [
-    {
-        id: "1",
-        userId: 1,
-        name: "나나",
-        tag: "1234",
-        bio: "안녕하세요! 저는 나나입니다.",
-        profileImageUrl: null,
-    },
-    {
-        id: "2",
-        userId: 2,
-        name: "얀",
-        tag: "2342",
-        bio: "^^",
-        profileImageUrl: null,
-    },
-    {
-        id: "3",
-        userId: 3,
-        name: "지말",
-        tag: "1214",
-        bio: "ㅎㅎ",
-        profileImageUrl: null,
-    },
-    {
-        id: "4",
-        userId: 4,
-        name: "코다",
-        tag: "1223",
-        bio: ";ㅁ;",
-        profileImageUrl: null,
-    },
-    {
-        id: "5",
-        userId: 5,
-        name: "딜런",
-        tag: "1777",
-        bio: ".",
-        profileImageUrl: null,
-    },
-]
-
 function FriendPage() {
-    const [followList, setFollowList] = useState(initialFollowList);
-
-    const followIds = useMemo(
-        () => new Set(followList.map((x) => x.Id)),
-    [followList]);
-
+    const [followList, setFollowList] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [error, setError] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedFriend, setSelectedFriend] = useState(null);
 
-    const handleFollow = (user) => {
-        if (!user?.userId) return;
-        if (followIds.has(String(user.userId))) return;
+    useEffect(() => {
+        let active = true;
 
-        setFollowList((prev) => [...prev, user]);
+        async function loadFollowings() {
+            try {
+                const data = await get(config.FOLLOW.FOLLOWINGS);
+                if (data?.isSuccess === false || !Array.isArray(data?.result)) throw new Error();
+                if (active) setFollowList(data.result.map(toFriendModel));
+            } catch {
+                if (active) setError("팔로우 목록을 불러오지 못했습니다.");
+            } finally {
+                if (active) setLoading(false);
+            }
+        }
+
+        loadFollowings();
+        return () => { active = false; };
+    }, []);
+
+    const handleFollow = async (user) => {
+        if (loading || saving || followList.some(({ id }) => id === user.id)) return;
+
+        setSaving(true);
+        setError("");
+        try {
+            const data = await post(config.FOLLOW.ROOT, { toUserId: user.userId });
+            if (data?.isSuccess === false || !data?.result) throw new Error();
+            setFollowList((prev) => [...prev, toFriendModel(data.result)]);
+        } catch {
+            setError("팔로우하지 못했습니다.");
+        } finally {
+            setSaving(false);
+        }
     };
 
     const handleClickRemove = (friend) => {
+        if (saving) return;
         setSelectedFriend(friend);
         setIsModalOpen(true);
-    }
+    };
 
-    const handleConfirmRemove = () => {
-        if (!selectedFriend) return;
-        setFollowList((prev) => 
-            prev.filter((freind) => freind.id !== selectedFriend.id)
-        );
-        setIsModalOpen(false);
-        setSelectedFriend(null);
+    const handleConfirmRemove = async () => {
+        if (!selectedFriend || saving) return;
+
+        setSaving(true);
+        setError("");
+        try {
+            const data = await del(config.FOLLOW.ROOT, { data: { toUserId: selectedFriend.userId } });
+            if (data?.isSuccess === false) throw new Error();
+            setFollowList((prev) => prev.filter(({ id }) => id !== selectedFriend.id));
+            handleCloseModal();
+        } catch {
+            setError("팔로우를 취소하지 못했습니다.");
+        } finally {
+            setSaving(false);
+        }
     };
 
     const handleCloseModal = () => {
@@ -88,21 +83,23 @@ function FriendPage() {
     return (
         <div className="friend-page">
             <div className="friend-page__inner">
+                {error && <p role="status">{error}</p>}
                 <div className="friend-page__grid">
                     <FriendList
                         friends={followList}
                         onClickRemove={handleClickRemove}
-                        emptyText="팔로우하는 친구가 없습니다."
+                        emptyText={loading ? "팔로우 목록을 불러오는 중입니다." : "팔로우하는 친구가 없습니다."}
                     />
 
-                    <FreindSearch
+                    <FriendSearch
                         onFollow={handleFollow}
                         followingList={followList}
+                        followDisabled={loading || saving}
                     />
                 </div>
             </div>
 
-            <FreindUnfollowModal
+            <FriendUnfollowModal
                 isOpen={isModalOpen}
                 friend={selectedFriend}
                 onConfirm={handleConfirmRemove}
