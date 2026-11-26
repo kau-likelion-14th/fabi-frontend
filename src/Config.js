@@ -1,26 +1,29 @@
 const config = {
     API_URL: "",
 
+    FOLLOW: {
+        FOLLOWINGS: "/api/follow/followings",
+        SEARCH: "/api/follow/search",
+        CREATE: "/api/follow",
+        DELETE: "/api/follow",
+        PROFILE: (id) => `/api/follow/${id}`,
+        CALENDAR: (id) => `/api/follow/${id}/calendar`,
+        TODOS: (id) => `/api/follow/${id}/todos`,
+    },
+
     CALENDAR: {
         GET: "/api/todos/calendar",
     },
 
     TODOS: {
         LIST: "/api/todos",
+        DETAIL: (todoId) => `/api/todos/${todoId}`,
+        DELETE: (todoId, date) => `/api/todos/${todoId}/dates/${date}`,
         TOGGLE_COMPLETE: (todoId, date) => `/api/todos/${todoId}/dates/${date}/complete`,
     },
 
     CATEGORIES: {
         GET: "/api/categories",
-    },
-
-    FOLLOW: {
-        ROOT: "/api/follow",
-        FOLLOWINGS: "/api/follow/followings",
-        SEARCH: "/api/follow/search",
-        PROFILE: (id) => `/api/follow/${id}`,
-        CALENDAR: (id) => `/api/follow/${id}/calendar`,
-        TODOS: (id) => `/api/follow/${id}/todos`,
     },
 
     PROFILE: {
@@ -37,9 +40,9 @@ const config = {
 
     AUTH:{
         KAKAO: "/api/auth/kakao",
-        REISSUE: "api/auth/reissue",
-        LOGOUT: "api/auth/logout",
-        WITHDRAW: "api/auth/withdraw"
+        REISSUE: "/api/auth/reissue",
+        LOGOUT: "/api/auth/logout",
+        WITHDRAW: "/api/auth/withdraw"
     },
 
     STATISTICS: {

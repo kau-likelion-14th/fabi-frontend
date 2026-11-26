@@ -26,6 +26,7 @@ function useFriendQuery(endpoint, query = "") {
   const [response, setResponse] = useState(null);
 
   useEffect(() => {
+    if (!endpoint) return undefined;
     let active = true;
 
     async function load() {
@@ -63,9 +64,10 @@ function FriendDetail({ id }) {
   const year = viewDate.getFullYear();
   const month = viewDate.getMonth() + 1;
 
-  const profile = useFriendQuery(config.FOLLOW.PROFILE(id));
-  const calendar = useFriendQuery(config.FOLLOW.CALENDAR(id), `year=${year}&month=${month}`);
-  const dailyTodos = useFriendQuery(config.FOLLOW.TODOS(id), `date=${dateKey}`);
+  const isRealFriend = /^\d+$/.test(id);
+  const profile = useFriendQuery(isRealFriend ? config.FOLLOW.PROFILE(id) : null);
+  const calendar = useFriendQuery(isRealFriend ? config.FOLLOW.CALENDAR(id) : null, `year=${year}&month=${month}`);
+  const dailyTodos = useFriendQuery(isRealFriend ? config.FOLLOW.TODOS(id) : null, `date=${dateKey}`);
 
   const friend = profile?.result
     ? {
@@ -123,7 +125,7 @@ function FriendDetail({ id }) {
               <div className="friend-detail-page__name-line">
                 {/* 친구 이름 출력 */}
                 <span className="friend-detail-page__name">
-                  {friend?.name || (profile?.error ? "친구 정보를 불러오지 못했습니다." : "친구 정보를 불러오는 중입니다.")}
+                  {friend?.name || ((!isRealFriend || profile?.error) ? "친구 정보를 불러오지 못했습니다." : "친구 정보를 불러오는 중입니다.")}
                 </span>
               </div>
               <div className="friend-detail-page__bio">
@@ -150,7 +152,7 @@ function FriendDetail({ id }) {
             <FriendTodo
               title="To do List"
               todos={todos}
-              status={dailyTodos?.error ? "error" : dailyTodos ? "ready" : "loading"}
+              status={dailyTodos?.error ? "error" : dailyTodos || !isRealFriend ? "ready" : "loading"}
               categories={Categories}
             />
           </div>
